@@ -97,19 +97,17 @@ class MemberOnlyIndex(Resource):
 
 class MemberOnlyArticle(Resource):
     
-    def get(self, id):
-        # Check if user is logged in
+  def get(self, id):
+        # Check if the user is logged in
         if not session.get('user_id'):
-            return {'error': 'unauthorized. please log in to access this content'}
+            return {'error': 'unauthorized. please log in to access this content'}, 401
         
         # Fetch the specific member-only article by ID
-        article = Article.query.filter_by(id=id, is_member_only=True).first()
-        if not article:
+        article = Article.query.filter_by(id=id).first()
+        if not article or not article.is_member_only:
             return {'error': 'Article not found or not members-only.'}, 404
         
         return article.to_dict(), 200
-
-
 api.add_resource(ClearSession, '/clear', endpoint='clear')
 api.add_resource(IndexArticle, '/articles', endpoint='article_list')
 api.add_resource(ShowArticle, '/articles/<int:id>', endpoint='show_article')
